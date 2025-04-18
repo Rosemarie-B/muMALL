@@ -1,0 +1,81 @@
+%======================================================%
+% Linear logic propositions as types
+%======================================================%
+
+LF tp : type =
+| ①  : tp
+| ⊥  : tp
+| ⊤ : tp
+| ⊗  : tp → tp → tp
+| ⅋  : tp → tp → tp
+| &  : tp → tp → tp
+| -o : tp → tp → tp
+| ⊕  : tp → tp → tp
+| ∃ : (nat → tp) → tp
+| ∀ : (nat → tp) → tp
+| eq : nat → nat → tp
+| ≠ : nat → nat → tp
+| μ0 : (tp → tp) → tp
+| ν0 : (tp → tp) → tp
+| μ1 : ((nat → tp) → (nat → tp)) → nat → tp
+| ν1 : ((nat → tp) → (nat → tp)) → nat → tp
+| μ2 : ((nat → nat → tp) → (nat → nat → tp)) → nat → nat → tp
+| ν2 : ((nat → nat → tp) → (nat → nat → tp)) → nat → nat → tp
+| μ3 : ((nat → nat → nat → tp) → (nat → nat → nat → tp)) → nat → nat → nat → tp
+| ν3 : ((nat → nat → nat → tp) → (nat → nat → nat → tp)) → nat → nat → nat → tp;
+
+--infix ⊗ 5 left.
+--infix ⅋ 5 left.
+--infix ⊕ 4 left.
+--infix & 4 left.
+--infix -o 5 right.
+
+--prefix ∀ 8.
+--prefix ∃ 8.
+--infix eq 3 left.
+--infix ≠ 3 left.
+
+% Type equality
+
+LF eqt : tp → tp → type =
+| refl : eqt A A;
+
+% Duality condition for CP
+
+LF dual : tp → tp → type =
+| D1 : dual ① ⊥
+| D⊥ : dual ⊥ ①
+| D⊗ : dual A A' → dual B B' → dual (A ⊗ B) (A' ⅋ B')
+| D⅋ : dual A A' → dual B B' → dual (A ⅋ B) (A' ⊗ B')
+| D& : dual A A' → dual B B' → dual (A & B) (A' ⊕ B')
+| D⊕ : dual A A' → dual B B' → dual (A ⊕ B) (A' & B')
+| Deq : dual (X eq Y) (X ≠ Y)
+| D≠ : dual (X ≠ Y) (X eq Y)
+| D∃ : dual (A x) (A' x) → dual (∃ A) (∀ A')
+| D∀ : dual (A x) (A' x) → dual (∀ A) (∃ A')
+| Dμ0 : dual p p' → dual (A p) (A' p') → dual (μ0 A) (ν0 A')
+| Dν0 : dual p p' → dual (A p) (A' p') → dual (ν0 A) (μ0 A');
+%{The following will not type-check when used due to
+% unification contraints.
+| Dμ1 : dual (p B) (p' B) → dual (A p x) (A' p' x) → dual (μ1 A X) (ν1 A' X)
+| Dν1 : dual (p B) (p' B) → dual (A p x) (A' p' x) → dual (ν1 A X) (μ1 A' X)
+| Dμ2 : dual (p B C) (p' B C) → dual (A p x y) (A' p' x y) → dual (μ2 A X Y) (ν2 A' X Y)
+| Dν2 : dual (p B C) (p' B C) → dual (A p x y) (A' p' x y) → dual (ν2 A X Y) (μ2 A' X Y)
+| Dμ3 : dual (p B C D) (p' B C D) → dual (A p x y z) (A' p' x y z) → dual (μ3 A X Y Z) (ν3 A' X Y Z)
+| Dν3 : dual (p B C D) (p' B C D) → dual (A p x y z) (A' p' x y z) → dual (ν3 A X Y Z) (μ3 A' X Y Z);
+}%
+
+LF neg : tp → type =
+| N⊥ : neg ⊥
+| N⅋ : neg A → neg B → neg (A ⅋ B)
+| N& : neg A → neg B → neg (A & B)
+| N≠ : neg (X ≠ Y)
+| N∀ : neg (A x) → neg (∀ A)
+| Nν0 : neg p → neg (A p) → neg (ν0 A);
+%{The following will not type-check when used due to
+% unification contraints.
+| Dμ1 : dual (p B) (p' B) 
+| Nν1 : neg (p B) → neg (A p x) → neg (ν1 A X)
+| Nν2 : neg (A p' x y) → neg (ν2 A X Y)
+| Nν3 : neg (A p x y z) → neg (ν3 A X Y Z);
+}%

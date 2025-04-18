@@ -1,0 +1,188 @@
+%======================================================%
+% Arithmetic theorems using fixed points in μMALL
+%======================================================%
+
+% Base case for natural numbers. i.e. nat 0
+rec nat_base : (Ψ:ctx) [Ψ ⊢ mu (cons nil (μ1 (\N.\x. ((x eq zero) ⊕ (∃\y. ((x eq (suc y)) ⊗ (N y))))) zero)  𝟙)] =
+[_ ⊢  mu/μ1nat upd/t
+	(mu/⊕l upd/t
+	   (mu/eq upd/t (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) nat/refl)
+	)
+];
+
+% Unfolding nat x once allows us to prove nat 1.
+rec nat1 : (Ψ:ctx) [Ψ ⊢ mu (cons nil (μ1 (\N.\x. ((x eq zero) ⊕ (∃\y. ((x eq (suc y)) ⊗ (N y))))) (suc zero))  𝟙)] =
+[_ ⊢  mu/μ1nat upd/t
+	(mu/⊕r upd/t
+	   (mu/∃ refl upd/t
+	      (mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/01)
+	         (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+	         (mu/μ1nat upd/t
+		    (mu/⊕l upd/t
+		       (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+		    )
+		 )
+              )
+	   )
+	)
+];
+
+% Base case for even. i.e. even 0
+rec even_base : (Ψ:ctx) [Ψ ⊢ mu (cons nil (μ1 (\E.\x. ((x eq zero) ⊕ (∃\y. ((x eq (suc(suc y))) ⊗ (E y))))) (zero))  𝟙)] =
+[_ ⊢ mu/μ1even upd/t
+	(mu/⊕l upd/t
+	   (mu/eq upd/t (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) nat/refl)
+	)
+];
+
+% 2 is even
+rec even2 : (Ψ:ctx) [Ψ ⊢ mu (cons nil (μ1 (\E.\x. ((x eq zero) ⊕ (∃\y. ((x eq (suc(suc y))) ⊗ (E y))))) (suc(suc zero)))  𝟙)] =
+[_ ⊢ mu/μ1even upd/t
+	(mu/⊕r upd/t
+	   (mu/∃ refl upd/t
+	      (mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/01)
+	         (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+	         (mu/μ1even upd/t
+		    (mu/⊕l upd/t
+		       (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+		    )
+		 )
+              )
+	   )
+	)
+];
+
+% ∀\a. a ≤ a
+rec leq_reflexive : (Ψ:ctx) [Ψ ⊢ mu (cons nil (∀\a. (μ2 (\L.\x.\y. ((x eq y) ⊕ (∃\y'. ((y eq (suc y')) ⊗ (L x y'))))) a a ))  𝟙)] =
+[_ ⊢ mu/∀ upd/t
+       (\a. (mu/μ2leq upd/t
+	  (mu/⊕l upd/t
+	     (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) nat/refl)
+	  )
+       ))
+];
+
+% 4 ≤ 5
+rec leq45 : (Ψ:ctx) [Ψ ⊢ mu (cons nil (μ2 (\L.\x.\y. ((x eq y) ⊕ (∃\y'. ((y eq (suc y')) ⊗ (L x y'))))) (suc(suc(suc(suc zero)))) (suc(suc(suc(suc(suc zero))))))  𝟙)] =
+[_ ⊢ mu/μ2leq upd/t
+       (mu/⊕r upd/t
+	  (mu/∃ refl upd/t
+	     (mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/01)
+	         (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+	         (mu/μ2leq upd/t
+		    (mu/⊕l upd/t
+		       (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+		    )
+		 )
+              )
+	   )
+	)
+];
+
+% half of 2 is 1
+rec half21 : (Ψ:ctx)
+	     [Ψ ⊢ mu (cons nil (μ2 (\H.\x.\h. ((x eq zero) ⊕ (x eq (suc zero))) ⊗ (h eq zero) ⊕ (∃\x'.∃\h'. (x eq (suc(suc x'))) ⊗ (h eq (suc h')) ⊗ (H x' h'))) (suc(suc zero)) (suc zero))  𝟙)] =
+[_ ⊢ mu/μ2half upd/t
+       (mu/⊕r upd/t
+	  (mu/∃ refl upd/t
+	     (mu/∃ refl upd/t
+		(mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/00) •/01)
+		    (mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/00) •/00) •/01)
+		       (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+		       (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+		    )
+		    (mu/μ2half upd/t
+		       (mu/⊕l upd/t
+			  (mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/00) •/00) •/00) •/00) •/01)
+			     (mu/⊕l upd/t
+			        (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+			     )
+			     (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+                          )
+		       )
+		    )
+		 )
+              )
+	   )
+	)
+];
+
+% 0 + 0 = 0
+rec addition_base : (Ψ:ctx) [Ψ ⊢ mu (cons nil (μ3 (\P.\x.\y.\u. ((x eq zero) ⊗ (y eq u)) ⊕ (∃\x'.∃\u'. (x eq (suc x')) ⊗ (u eq (suc u')) ⊗ (P x' y u'))) zero zero zero) 𝟙)] =
+[_ ⊢ mu/μ3plus upd/t
+       (mu/⊕l upd/t
+	  (mu/⊗ upd/t (mg/c (mg/c (mg/c mg/n •/00) •/00) •/01)
+	      (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) nat/refl)
+	      (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) nat/refl)
+          )
+       )
+];
+
+% ∀\a. 0 + a = a
+rec addition_identity : (Ψ:ctx) [Ψ ⊢ mu (cons nil (∀\a.(μ3 (\P.\x.\y.\u. ((x eq zero) ⊗ (y eq u)) ⊕ (∃\x'.∃\u'. (x eq (suc x')) ⊗ (u eq (suc u')) ⊗ (P x' y u'))) zero a a)) 𝟙)] =
+[_ ⊢ mu/∀ upd/t
+       (\a. (mu/μ3plus upd/t
+	  (mu/⊕l upd/t
+	     (mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/01)
+	        (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+	        (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+             )
+          )
+       ))
+];
+
+% ∃\n. 1 + 1 = n ⊗ nat n
+rec addition_verification : (Ψ:ctx) [Ψ ⊢ mu (cons nil (∃\n. (μ3 (\P.\x.\y.\u. ((x eq zero) ⊗ (y eq u)) ⊕ (∃\x'.∃\u'. (x eq (suc x')) ⊗ (u eq (suc u')) ⊗ (P x' y u'))) (suc zero) (suc zero) n ) ⊗ (μ1 (\N.\x. ((x eq zero) ⊕ (∃\y. ((x eq (suc y)) ⊗ (N y))))) n )) 𝟙)] =
+[_ ⊢ mu/∃ refl upd/t
+       (mu/⊗ upd/t (mg/c (mg/c mg/n •/00) •/01)
+          (mu/μ3plus upd/t
+	     (mu/⊕r upd/t
+		(mu/∃ refl upd/t
+		   (mu/∃ refl upd/t 
+		      (mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/00) •/00) •/00) •/01)
+		         (mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/00) •/00) •/00) •/00) •/01)
+			    (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+			    (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+
+			 )
+			 (mu/μ3plus upd/t
+			    (mu/⊕l upd/t
+			       (mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/00) •/00) •/00) •/00) •/00) •/00) •/01)
+				  (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+				  (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+			       )
+			    )
+			 )
+		      )
+
+		   )
+
+		)
+
+	     )
+	  )
+	  (mu/μ1nat upd/t
+	     (mu/⊕r upd/t
+		(mu/∃ refl upd/t
+		   (mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/00) •/00) •/01)
+	              (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+	              (mu/μ1nat upd/t
+			 (mu/⊕r upd/t
+			    (mu/∃ refl upd/t
+			       (mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/00) •/00) •/00) •/00) •/00) •/00) •/01)
+			          (mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+				  (mu/μ1nat upd/t
+				     (mu/⊕l upd/t
+					(mu/eq upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) nat/refl)
+				     )
+				  )
+			       )
+			    )
+			 )
+		      )
+		   )
+		)
+	     )
+	  )
+       )
+];

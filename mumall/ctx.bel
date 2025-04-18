@@ -1,0 +1,49 @@
+%======================================================%
+% Explicit contexts
+%======================================================%
+
+%------------------------------------------------------%
+% Length-indexed typing contexts
+%------------------------------------------------------%
+
+LF lctx : nat → type =
+| nil : lctx zero
+| cons : lctx N → tp → mult → lctx (suc N);
+
+% Typing context equality
+
+LF cx_eq : lctx N → lctx N → type =
+| cx/refl : cx_eq Δ Δ;
+
+%------------------------------------------------------%
+% Main operations on typing contexts
+%------------------------------------------------------%
+
+% Splitting / merging typing contexts: Δ₁ ⋈ Δ₂ = Δ
+
+LF merge : lctx N → lctx N → lctx N → type =
+| mg/n : merge nil nil nil
+| mg/c : merge Δ₁ Δ₂ Δ → • α₁ α₂ α → merge (cons Δ₁ A α₁) (cons Δ₂ A α₂) (cons Δ A α);
+
+% Δ[x :α A ↦ₙ y :β B] = Δ'
+% i.e., x appears in Δ at position n with type A and multiplicity α, and
+% Δ' is the result of changing that entry to y :β B
+
+LF upd : lctx N → tp → mult → mult → lctx N → type =
+| upd/t : upd (cons Δ A α) A α α' (cons Δ A α')
+| upd/n : upd Δ A α α' Δ' → upd (cons Δ B β) A α α' (cons Δ' B β);
+
+% Only unrestricted assumptions appear in Δ,
+% parametric to the predicate "hal α"; in the case of linear type systems,
+% "hal α" holds when α = 𝟘 (unavailable).
+
+LF exh : lctx _ → type =
+| exh/n : exh nil
+| exh/c : exh Δ → hal α → exh (cons Δ _ α);
+
+% Δ ≈ Δ', Δ = Δ' up to varying multiplicities
+% (corresponds to 0Δ = 0Δ' for linear systems)
+
+LF same_elts: lctx N → lctx N → type =
+| se/n : same_elts nil nil
+| se/c : same_elts Δ Δ' → same_elts (cons Δ A _) (cons Δ' A _);

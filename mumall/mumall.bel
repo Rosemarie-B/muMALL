@@ -1,0 +1,188 @@
+%======================================================%
+% Rules of μMALL
+%======================================================%
+
+LF mu : lctx _ → type =
+
+| mu/init :
+  dual A A'
+  → upd Δ A' 𝟙 𝟘 Δ' → upd Δ' A 𝟙 𝟘 Δ'' → exh Δ''
+  → mu Δ
+
+| mu/① :
+  upd Δ ① 𝟙 𝟘 Δ' → exh Δ'
+  → mu Δ
+
+| mu/⊥ :
+  upd Δ ⊥ 𝟙 𝟘 Δ'
+  → mu Δ'
+  → mu Δ
+
+| mu/⊤ :
+  upd Δ ⊤ 𝟙 𝟙 Δ
+  → mu Δ
+
+| mu/⊗ :
+  upd Δ₂ (A ⊗ B) 𝟙 𝟘 Δ₂'
+  → merge Δ₁ Δ₂ Δ
+  → (mu (cons Δ₁ A 𝟙))
+  → (mu (cons Δ₂' B 𝟙))
+  → mu Δ
+
+| mu/⅋ :
+  upd Δ (A ⅋ B) 𝟙 𝟘 Δ'
+  → (mu (cons (cons Δ' B 𝟙) A 𝟙))
+  → mu Δ
+
+| mu/cut :
+  dual A A'
+  → merge Δ₁ Δ₂ Δ
+  → (mu (cons Δ₁ A 𝟙))
+  → (mu (cons Δ₂ A' 𝟙))
+  → mu Δ
+
+| mu/⊕l :
+  upd Δ (A ⊕ B) 𝟙 𝟘 Δ'
+  → (mu (cons Δ' A 𝟙))
+  → mu Δ
+
+| mu/⊕r :
+  upd Δ (A ⊕ B) 𝟙 𝟘 Δ'
+  → (mu (cons Δ' B 𝟙))
+  → mu Δ
+
+| mu/& :
+  upd Δ (A & B) 𝟙 𝟘 Δ'
+  → (mu (cons Δ' A 𝟙))
+  → (mu (cons Δ' B 𝟙))
+  → mu Δ
+
+| mu/eq :
+  upd Δ (t eq t') 𝟙 𝟘 Δ' → exh Δ' → nat_eq t t'
+  → mu Δ
+
+| mu/≠ :
+  upd Δ (t ≠ t') 𝟙 𝟘 Δ' → exh Δ' → neq t t'
+  → mu Δ
+
+| mu/∀ :
+  upd Δ (∀ (\x. A x)) 𝟙 𝟘 Δ'
+  → ({y:nat} mu (cons Δ' (A y) 𝟙))
+  → mu Δ
+
+| mu/∃ :
+  eqt (A _) B
+  → upd Δ (∃ A) 𝟙 𝟘 Δ'
+  → mu (cons Δ' B 𝟙)
+  → mu Δ
+
+| mu/μν0 :
+  dual (μ0 A) (ν0 A')
+  → upd Δ (μ0 A) 𝟙 𝟘 Δ'
+  → upd Δ' (ν0 A') 𝟙 𝟘 Δ'' → exh Δ''
+  → mu Δ
+
+| mu/μ0 :
+  upd Δ (μ0 A) 𝟙 𝟘 Δ'
+  → mu (cons Δ' (A (μ0 A)) 𝟙)
+  → mu Δ
+
+| mu/unfold0 :
+  upd Δ (ν0 A) 𝟙 𝟘 Δ'
+  → mu (cons Δ' (A (ν0 A)) 𝟙)
+  → mu Δ
+
+| mu/ν0ex :
+  upd Δ (ν0\N. A ⊕ (A ⊕ N)) 𝟙 𝟘 Δ'
+  → dual (A ⊕ (ν0\N. (A ⊕ N))) (A' & (μ0\N. (A' & N)))
+  → mu (cons Δ' (A ⊕ (ν0\N. (A ⊕ N))) 𝟙)
+  → mu (cons (cons nil (A ⊕ (A ⊕ (A ⊕ (ν0\N. (A ⊕ N))))) 𝟙) (A' & (μ0\N. (A' & N))) 𝟙)
+  → mu Δ
+
+| mu/C :
+  neg A
+  → upd Δ A 𝟙 𝟙 Δ'
+  → mu (cons Δ' A 𝟙)
+  → mu Δ
+
+| mu/W :
+  neg A
+  → upd Δ A 𝟙 𝟘 Δ'
+  → mu Δ'
+  → mu Δ
+
+%{=====================================================%
+% General form of various μ/ν rules.
+% The following will not type-check when used due to
+% unification contraints.
+%======================================================%
+
+| mu/μ1 :
+  upd Δ (μ1 A T) 𝟙 𝟘 Δ'
+  → mu (cons Δ' (A (μ1 A) T) 𝟙)
+  → mu Δ
+
+| mu/μ2 :
+  upd Δ (μ2 A T1 T2) 𝟙 𝟘 Δ'
+  → mu (cons Δ' (A (μ2 A) T1 T2) 𝟙)
+  → mu Δ      
+
+| mu/μ3 :
+  upd Δ (μ3 A T1 T2 T3) 𝟙 𝟘 Δ'
+  → mu (cons Δ' (A (μ3 A) T1 T2 T3) 𝟙)
+  → mu Δ
+
+| mu/unfold1 :
+  upd Δ (ν1 A T) 𝟙 𝟘 Δ'
+  → mu (cons Δ' (A (ν1 A) T) 𝟙)
+  → mu Δ
+
+| mu/ν0 :
+  upd Δ (ν0 A) 𝟙 𝟘 Δ'
+  → dual S S'
+  → mu (cons Δ' S 𝟙)
+  → mu (cons (cons nil (A S) 𝟙) S' 𝟙)
+  → mu Δ
+
+| mu/ν1 :
+  upd Δ (ν0 A T) 𝟙 𝟘 Δ'
+  → dual S S'
+  → mu (cons Δ' (S T) 𝟙)
+  → mu (cons (cons nil (A S X) 𝟙) (S X) 𝟙)
+  → mu Δ
+}%
+       
+%======================================================%
+% Arithmetic specific versions of μ/ν unfolding rules.
+%======================================================%
+| mu/μ1nat :
+  upd Δ (μ1 (\N.\x. ((x eq zero) ⊕ (∃\y. ((x eq (suc y)) ⊗ (N y))))) T) 𝟙 𝟘 Δ'
+  → mu (cons Δ' ((T eq zero) ⊕ (∃\S. ((T eq (suc S)) ⊗ (μ1 (\N.\x. ((x eq zero) ⊕ (∃\y. ((x eq (suc y)) ⊗ (N y))))) S)))) 𝟙)
+  → mu Δ
+
+| mu/μ1even :
+  upd Δ (μ1 (\E.\x. ((x eq zero) ⊕ (∃\y. ((x eq (suc(suc y))) ⊗ (E y))))) T) 𝟙 𝟘 Δ'
+  → mu (cons Δ' ((T eq zero) ⊕ (∃\S. ((T eq (suc(suc S))) ⊗ (μ1 (\E.\x. ((x eq zero) ⊕ (∃\y. ((x eq (suc(suc y))) ⊗ (E y))))) S)))) 𝟙)
+  → mu Δ
+
+| mu/μ2leq :
+  upd Δ (μ2 (\L.\x.\y. ((x eq y) ⊕ (∃\y'. ((y eq (suc y')) ⊗ (L x y'))))) T1 T2) 𝟙 𝟘 Δ'
+  → mu (cons Δ' (((T1 eq T2) ⊕ (∃\S2. ((T2 eq (suc S2)) ⊗ (μ2 (\L.\x.\y. ((x eq y) ⊕ (∃\y'. ((y eq (suc y')) ⊗ (L x y'))))) T1 S2))))) 𝟙)
+  → mu Δ
+
+| mu/μ2half :
+  upd Δ (μ2 (\H.\x.\h. ((x eq zero) ⊕ (x eq (suc zero))) ⊗ (h eq zero) ⊕ (∃\x'.∃\h'. (x eq (suc(suc x'))) ⊗ (h eq (suc h')) ⊗ (H x' h'))) T1 T2) 𝟙 𝟘 Δ'
+  → mu (cons Δ' (((T1 eq zero) ⊕ (T1 eq (suc zero))) ⊗ (T2 eq zero) ⊕ (∃\S1.∃\S2. (T1 eq (suc(suc S1))) ⊗ (T2 eq (suc S2)) ⊗ (μ2 (\H.\x.\h. ((x eq zero) ⊕ (x eq (suc zero))) ⊗ (h eq zero) ⊕ (∃\x'.∃\h'. (x eq (suc(suc x'))) ⊗ (h eq (suc h')) ⊗ (H x' h'))) S1 S2))) 𝟙)
+  → mu Δ
+
+| mu/μ3plus :
+  upd Δ (μ3 (\P.\x.\y.\u. ((x eq zero) ⊗ (y eq u)) ⊕ (∃\x'.∃\u'. (x eq (suc x')) ⊗ (u eq (suc u')) ⊗ (P x' y u'))) T1 T2 T3) 𝟙 𝟘 Δ'
+  → mu (cons Δ' (((T1 eq zero) ⊗ (T2 eq T3)) ⊕ (∃\S1.∃\S2. (T1 eq (suc S1)) ⊗ (T3 eq (suc S2)) ⊗ (μ3 (\P.\x.\y.\u. ((x eq zero) ⊗ (y eq u)) ⊕ (∃\x'.∃\u'. (x eq (suc x')) ⊗ (u eq (suc u')) ⊗ (P x' y u'))) S1 T2 S2))) 𝟙)
+  → mu Δ
+
+| mu/unfold1nat :
+  upd Δ (ν1 (\N.\x. ((x ≠ zero) & (∀\y. ((x ≠ (suc y)) ⅋ (N y))))) T) 𝟙 𝟘 Δ'
+  → mu (cons Δ' ((T ≠ zero) & (∀\S. ((T ≠ (suc S)) ⅋ (ν1 (\N.\x. ((x ≠ zero) & (∀\y. ((x ≠ (suc y)) ⅋ (N y))))) S)))) 𝟙)
+  → mu Δ
+;
+

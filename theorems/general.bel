@@ -1,0 +1,92 @@
+%======================================================%
+% General theorems in μMALL
+%======================================================%
+
+% ∀\x. x eq x
+rec equality_reflexivity : (Ψ:ctx) [Ψ ⊢ mu (cons nil (∀ \x. x eq x) 𝟙)] =
+[_ ⊢ mu/∀ upd/t
+	(\y. (mu/eq upd/t (exh/c (exh/c exh/n hal/0) hal/0) nat/refl))
+];
+
+% ∀\x. 0 ≠ suc(x)
+rec zero_not_successor : (Ψ:ctx) [Ψ ⊢ mu (cons nil (∀ \x. zero ≠ suc(A[x])) 𝟙)] =
+[_ ⊢ mu/∀ upd/t
+	(\y. (mu/≠ upd/t (exh/c (exh/c exh/n hal/0) hal/0) (neq/1 lt/z)))
+];
+
+% ∀\x.∃\y. x eq y
+rec existsx_1_eq_x : (Ψ:ctx) [Ψ ⊢ mu (cons nil (∀\x.(∃\y. x eq y)) 𝟙)] =
+[_ ⊢ mu/∀ upd/t
+       (\a.(mu/∃ refl upd/t
+	  (mu/eq upd/t (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) nat/refl)
+       ))
+];
+
+% Weakening and contracting [ ⊢ μ(λN. ① ⊕ (① ⊗ N)), ν(λN'. ⊥ & (⊥ ⅋ N'))], deriving itself
+rec CW_example : (Ψ:ctx) {DU: [Ψ ⊢ dual N[] N'[]]} {NEG: [Ψ ⊢ neg N[]]} [Ψ ⊢ mu (cons (cons nil (μ0\N. ① ⊕ (① ⊗ N)) 𝟙) (ν0\N'. ⊥ & (⊥ ⅋ N')) 𝟙)] = mlam DU, NEG ⇒
+[_ ⊢ mu/C (Nν0 NEG (N& N⊥ (N⅋ N⊥ NEG))) upd/t
+       (mu/W (Nν0 NEG (N& N⊥ (N⅋ N⊥ NEG))) upd/t
+	   (mu/μν0 ((Dμ0 DU (D⊕ D1 (D⊗ D1 DU)))) (upd/n (upd/n upd/t)) (upd/n upd/t) (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0))
+       )
+];
+
+% Derivation of [ ⊢ A, A'] with a cut removing [ ⊢ A ⊗ A]
+rec CW_cut_example : (Ψ:ctx) {DU: [Ψ ⊢ dual A[] A'[]]} {NEG: [Ψ ⊢ neg A'[]]} [Ψ ⊢ mu (cons (cons nil A[] 𝟙) A'[] 𝟙)] = mlam DU, NEG ⇒
+[_ ⊢ mu/cut (D⊗ DU DU) (mg/c (mg/c mg/n •/01) •/10)
+       (mu/C NEG (upd/n upd/t)
+	  (mu/⊗ (upd/n upd/t) (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/10) •/01) •/01)
+	     (mu/init DU (upd/n (upd/n (upd/n upd/t))) upd/t (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0))
+	     (mu/init DU (upd/n upd/t) upd/t (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0))
+	  )
+       )
+	  (mu/⅋ upd/t
+	     (mu/W NEG upd/t
+		(mu/init DU (upd/n upd/t) (upd/n (upd/n (upd/n (upd/n upd/t)))) (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0))
+	     )
+	  )
+];
+
+
+% [ ⊢ A ∧ (B ∨ C) ⊃ ((A ∧ B) ∨ (A ∧ C))] translates to [ ⊢(A' ⅋ (B' & C')) ⅋ ((A ⊗ B) ⊕ (A ⊗ C))]
+rec tensor_distributivity : (Ψ:ctx) {DUA: [Ψ ⊢ dual A[] A'[]]} {DUB: [Ψ ⊢ dual B[] B'[]]} {DUC: [Ψ ⊢ dual C[] C'[]]} [Ψ ⊢ mu (cons nil ((A'[] ⅋ (B'[] & C'[])) ⅋ ((A[] ⊗ B[]) ⊕ (A[] ⊗ C[])))  𝟙)] = mlam DUA, DUB, DUC ⇒
+[_ ⊢ mu/⅋ upd/t
+       (mu/⅋ upd/t
+	  (mu/& (upd/n upd/t)
+	     (mu/⊕l (upd/n(upd/n(upd/n(upd/n upd/t))))
+		(mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/00) •/10) •/01) •/01)
+		   (mu/init DUA (upd/n(upd/n(upd/n upd/t))) upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0))
+		    (mu/init DUB (upd/n(upd/n upd/t)) upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0))
+		)
+	     )
+	     (mu/⊕r (upd/n(upd/n(upd/n(upd/n upd/t))))
+		(mu/⊗ upd/t (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c (mg/c mg/n •/00) •/00) •/00) •/00) •/10) •/01) •/01)
+		   (mu/init DUA (upd/n(upd/n(upd/n upd/t))) upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0))
+		   (mu/init DUC (upd/n(upd/n upd/t)) upd/t (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0) hal/0))
+		)
+	     )
+	  )
+       )
+];
+
+% [ ⊢ μ(λM. ⊥ & M), ν(λN. ① ⊕ (① ⊕ N))]
+rec μν_example : (Ψ:ctx) {DU: [Ψ ⊢ dual B[] B'[]]} [Ψ ⊢ mu (cons (cons nil (μ0\B. ⊥ & B) 𝟙) (ν0\B'. ① ⊕ (① ⊕ B')) 𝟙) ] = mlam DU ⇒
+[_ ⊢ mu/ν0ex upd/t (D⊕ D1 (Dν0 DU (D⊕ D1 DU)))
+       (mu/⊕r upd/t
+	  (mu/μν0 (Dμ0 DU (D& D⊥ DU)) (upd/n(upd/n(upd/n upd/t))) upd/t (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0)))
+       (mu/⊕r (upd/n upd/t)
+	  (mu/⊕r (upd/t)	
+             (mu/init (D⊕ D1 (Dν0 DU (D⊕ D1 DU))) (upd/n (upd/n upd/t)) upd/t (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0))
+	  )
+       )
+];
+
+% [ ⊢ μ(λB. 1 ⊗ B), ⊤]
+% μ can be unfolded an arbitrary number n times, creating n branches containing ①.
+% Termination is forced with ⊤.
+rec top_termiation : (Ψ:ctx) [Ψ ⊢ mu (cons (cons nil (μ0\B. ① ⊗ B) 𝟙) ⊤ 𝟙) ] =
+[_ ⊢ mu/μ0 (upd/n upd/t)
+       (mu/⊗ upd/t (mg/c (mg/c (mg/c mg/n •/00) •/01) •/01)
+	  (mu/① upd/t (exh/c (exh/c (exh/c (exh/c exh/n hal/0) hal/0) hal/0) hal/0))
+	  (mu/⊤ (upd/n (upd/n upd/t)))
+       )
+];
