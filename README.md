@@ -1,0 +1,1 @@
+This is an partial implementation of [μMALL](https://arxiv.org/abs/0910.3383) in [Beluga](https://github.com/Beluga-lang/Beluga) using [CARVe](https://github.com/dzackon/carve). We implemented rules for various arithmetic properties using least fixed points. ex. natural numbers and addition. We also implemented a number of proofs of theorems derivable in μMALL.
