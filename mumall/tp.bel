@@ -1,5 +1,5 @@
 %======================================================%
-% Linear logic propositions as types
+% μMALL propositions as types
 %======================================================%
 
 LF tp : type =
@@ -9,7 +9,6 @@ LF tp : type =
 | ⊗  : tp → tp → tp
 | ⅋  : tp → tp → tp
 | &  : tp → tp → tp
-| -o : tp → tp → tp
 | ⊕  : tp → tp → tp
 | ∃ : (nat → tp) → tp
 | ∀ : (nat → tp) → tp
@@ -28,7 +27,6 @@ LF tp : type =
 --infix ⅋ 5 left.
 --infix ⊕ 4 left.
 --infix & 4 left.
---infix -o 5 right.
 
 --prefix ∀ 8.
 --prefix ∃ 8.
