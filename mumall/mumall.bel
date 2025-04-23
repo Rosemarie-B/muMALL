@@ -19,7 +19,7 @@ LF mu : lctx _ → type =
   → mu Δ
 
 | mu/⊤ :
-  upd Δ ⊤ 𝟙 𝟙 Δ
+  upd Δ ⊤ 𝟙 𝟘 Δ'
   → mu Δ
 
 | mu/⊗ :
@@ -146,9 +146,9 @@ LF mu : lctx _ → type =
 
 | mu/ν1 :
   upd Δ (ν0 A T) 𝟙 𝟘 Δ'
-  → dual S S'
+  → dual (S X) (S' X)
   → mu (cons Δ' (S T) 𝟙)
-  → mu (cons (cons nil (A S X) 𝟙) (S X) 𝟙)
+  → mu (cons (cons nil (A S X) 𝟙) (S' X) 𝟙)
   → mu Δ
 }%
        
@@ -185,4 +185,3 @@ LF mu : lctx _ → type =
   → mu (cons Δ' ((T ≠ zero) & (∀\S. ((T ≠ (suc S)) ⅋ (ν1 (\N.\x. ((x ≠ zero) & (∀\y. ((x ≠ (suc y)) ⅋ (N y))))) S)))) 𝟙)
   → mu Δ
 ;
-
